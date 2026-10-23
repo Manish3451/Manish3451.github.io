@@ -70,7 +70,7 @@ h1 em{font-style:normal;color:var(--accent)}
 @media (max-width:820px){.metrics{grid-template-columns:repeat(2,1fr)}}
 
 /* sections */
-section{padding:72px 0;border-top:1px solid var(--line)}
+section{padding:72px 0;border-top:1px solid var(--line);scroll-margin-top:58px}
 .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:30px}
 h2{font-size:clamp(26px,3.2vw,34px);letter-spacing:-.02em;margin:0;line-height:1.15}
 .kicker{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:10px}
@@ -127,8 +127,16 @@ h2{font-size:clamp(26px,3.2vw,34px);letter-spacing:-.02em;margin:0;line-height:1
 .contact{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:40px;display:grid;grid-template-columns:1.3fr 1fr;gap:32px;align-items:center}
 .contact h2{margin-bottom:10px}
 .contact p{color:var(--ink-2);margin:0}
-.contact .ctas{justify-content:flex-end}
-@media (max-width:760px){.contact{grid-template-columns:1fr;padding:28px}.contact .ctas{justify-content:flex-start}}
+.brief{display:grid;gap:12px}
+.brief label{display:grid;gap:5px;font-size:13.5px;font-weight:500;color:var(--ink-2)}
+.brief input,.brief textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;width:100%;resize:vertical}
+.brief input:focus,.brief textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.brief .btn{justify-content:center;cursor:pointer}
+.brief .alt{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer}
+.linkbtn:hover{text-decoration:underline}
+.brief .email{margin:0;font-size:13px;color:var(--ink-3);text-align:center}
+@media (max-width:760px){.contact{grid-template-columns:1fr;padding:28px}}
 
 footer{padding:36px 0 48px;color:var(--ink-3);font-size:13.5px}
 footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -156,7 +164,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
     <h1>AI systems that are <em>accurate, fast</em> and actually in production.</h1>
     <p class="lede">I'm an AI Engineer building production RAG, multi-agent workflows and low-latency LLM inference. I help agencies and startups ship AI features their clients can trust — measured with real evaluation, not demos.</p>
     <div class="ctas">
-      <a class="btn primary" href="mailto:manishmandal192@gmail.com?subject=AI%20project%20enquiry">Start a project →</a>
+      <a class="btn primary" href="#contact">Start a project →</a>
       <a class="btn" href="#work">See production work</a>
       <a class="btn" href="https://github.com/Manish3451" target="_blank" rel="noopener">GitHub</a>
     </div>
@@ -351,10 +359,17 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
           <h2>Have a client asking for AI?</h2>
           <p>Tell me what they need. I'll reply within 24 hours with whether it's a fit, a fixed scope and a timeline. Based in Hyderabad, India — working with teams in India, the UK, the US and Australia.</p>
         </div>
-        <div class="ctas">
-          <a class="btn primary" href="mailto:manishmandal192@gmail.com?subject=AI%20project%20enquiry">manishmandal192@gmail.com</a>
-          <a class="btn" href="https://github.com/Manish3451" target="_blank" rel="noopener">GitHub</a>
-        </div>
+        <form class="brief" id="brief">
+          <label>Your name<input name="name" required autocomplete="name"></label>
+          <label>Company / agency<input name="company" autocomplete="organization"></label>
+          <label>What does your client need?<textarea name="need" rows="3" required placeholder="e.g. a chatbot that answers patient FAQs from a clinic's website"></textarea></label>
+          <button class="btn primary" type="submit">Send via Gmail →</button>
+          <div class="alt">
+            <a href="#" id="mailtoLink">Use another email app</a>
+            <button type="button" class="linkbtn" id="copyEmail">Copy email</button>
+          </div>
+          <p class="email mono">manishmandal192@gmail.com</p>
+        </form>
       </div>
     </div>
   </section>
@@ -377,6 +392,31 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
     try{localStorage.setItem('theme',next);}catch(e){}
   });
   document.getElementById('yr').textContent=new Date().getFullYear();
+
+  var EMAIL='manishmandal192@gmail.com', form=document.getElementById('brief');
+  function compose(){
+    var d=new FormData(form), name=(d.get('name')||'').trim(), co=(d.get('company')||'').trim();
+    return {
+      subject:'AI project enquiry'+(co?' — '+co:''),
+      body:'Hi Manish,\n\n'+(d.get('need')||'').trim()+'\n\n'+name+(co?'\n'+co:'')
+    };
+  }
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var m=compose();
+    window.open('https://mail.google.com/mail/?view=cm&fs=1&to='+EMAIL+'&su='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body),'_blank','noopener');
+  });
+  document.getElementById('mailtoLink').addEventListener('click',function(e){
+    e.preventDefault();
+    var m=compose();
+    location.href='mailto:'+EMAIL+'?subject='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body);
+  });
+  var copyBtn=document.getElementById('copyEmail');
+  copyBtn.addEventListener('click',function(){
+    function done(){copyBtn.textContent='Copied ✓';setTimeout(function(){copyBtn.textContent='Copy email';},1800);}
+    if(navigator.clipboard){navigator.clipboard.writeText(EMAIL).then(done,function(){prompt('Copy this email:',EMAIL);});}
+    else{prompt('Copy this email:',EMAIL);}
+  });
 })();
 </script>
 </body>
